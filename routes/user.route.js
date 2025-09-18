@@ -1,11 +1,12 @@
 const express = require('express');
+const { getSignin, getSignup, postSignup, postSignin, getDashboard } = require('../controllers/user.controller');
 const router = express.Router();
-const userController = require('../controllers/user.controller');
 
 // Define routes and link them to controller functions
-router.get('/signin', userController.getSignin);
-router.get('/', userController.getSignup);
-router.post('/login', userController.postLogin);
-router.get('/dashboard', userController.getDashboard);
+router.get('/signin', getSignin);
+router.get('/', getSignup);
+router.post('/signup', postSignup);
+router.post('/signin', postSignin);
+router.get('/dashboard', getDashboard);
 
 module.exports = router;
