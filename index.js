@@ -4,6 +4,10 @@ const dotenv = require('dotenv')
 const mongoose = require('mongoose')
 const userRoutes = require('./routes/user.route');
 const ejs = require('ejs')
+const cors = require('cors')
+
+
+app.use("cors")
 app.set('view engine', 'ejs')
 app.use(express.urlencoded({ extended: true}))
 dotenv.config()
