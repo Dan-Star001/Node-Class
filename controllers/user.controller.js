@@ -4,6 +4,11 @@
 import customerModel from '../models/user.model.js';
 import nodemailer from 'nodemailer';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken'
+// const dotenv = require('dotenv')
+import dotenv from 'dotenv';
+dotenv.config()
+const SECRET_KEY = process.env.jwt
 
 
 // Handles the GET request for the signup page
@@ -106,7 +111,21 @@ const postSignin = (req, res) => {
 
             // Success
             console.log("Login Successful for", foundCustomers.email);
-            res.redirect("/user/dashboard");
+
+            const token = jwt.sign({ email: req.body.email }, SECRET_KEY , { expiresIn: '1h' });
+            console.log("Generated Token:", token);
+            return res.json({
+                message: "Login Successful",
+                user: {
+                    id: foundCustomers._id,
+                    email: foundCustomers.email,
+                    firstName: foundCustomers.firstName,
+                    token: token
+                }
+            })
+
+
+            // res.redirect("/user/dashboard");
 
 
 
@@ -119,17 +138,35 @@ const postSignin = (req, res) => {
 }
 
 // Handles the GET request for the dashboard
+// const getDashboard = (req, res) => {
+//     customerModel.find()
+//         .then((allCustomers) => {
+//             console.log(allCustomers);
+//             res.render('dashboard', { allCustomers });
+//         })
+//         .catch((err) => {
+//             console.error("Error fetching customers:", err);
+//             res.status(500).send("Internal server error");
+//         });
+// };
+
 const getDashboard = (req, res) => {
-    customerModel.find()
-        .then((allCustomers) => {
-            console.log(allCustomers);
-            res.render('dashboard', { allCustomers });
-        })
-        .catch((err) => {
-            console.error("Error fetching customers:", err);
-            res.status(500).send("Internal server error");
-        });
-};
+    let token = req.headers.authorization.split(" ")[1]
+    jwt.verify(token, SECRET_KEY, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.send({status:false, message:"Token is expired or invalid"})
+        } else {
+            console.log(result);
+            let email = result.email
+            customerModel.findOne({ email: email })
+                .then((foundCustomer) => {
+                    res.send({status:true, message: "token is valid", foundCustomer})
+                })
+            
+        }
+    });
+}
 
 export { getSignup, getSignin, postSignup, postSignin ,getDashboard };
 // module.exports = { getSignup, getSignin, postLogin, getDashboard };
