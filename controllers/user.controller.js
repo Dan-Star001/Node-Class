@@ -8,7 +8,7 @@ import jwt from 'jsonwebtoken'
 // const dotenv = require('dotenv')
 import dotenv from 'dotenv';
 dotenv.config()
-const SECRET_KEY = process.env.jwt
+// const SECRET_KEY = process.env.jwt
 
 
 // Handles the GET request for the signup page
@@ -112,7 +112,7 @@ const postSignin = (req, res) => {
             // Success
             console.log("Login Successful for", foundCustomers.email);
 
-            const token = jwt.sign({ email: req.body.email }, SECRET_KEY , { expiresIn: '1h' });
+            const token = jwt.sign({ email: req.body.email }, "secretkey" , { expiresIn: '1h' });
             console.log("Generated Token:", token);
             return res.json({
                 message: "Login Successful",
@@ -152,7 +152,7 @@ const postSignin = (req, res) => {
 
 const getDashboard = (req, res) => {
     let token = req.headers.authorization.split(" ")[1]
-    jwt.verify(token, SECRET_KEY, (err, result) => {
+    jwt.verify(token, "secretkey", (err, result) => {
         if (err) {
             console.log(err);
             res.send({status:false, message:"Token is expired or invalid"})
